@@ -52,7 +52,7 @@ class App extends Component {
                   <div className="type_msg">
                     <div className="input_msg_write">
                       <input type="text" className="write_msg" placeholder="Type a message" />
-                      <button className="msg_send_btn" type="button"><i className="fa fa-paper-plane-o" aria-hidden="true"></i></button>
+                      <button className="msg_send_btn" type="button"><i class="far fa-paper-plane"></i></button>
                     </div>
                   </div>
                 </div>
