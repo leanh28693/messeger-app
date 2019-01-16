@@ -1,58 +1,66 @@
+/* main component for messager app */
 import React, { Component } from 'react';
 import './App.css';
 
 class App extends Component {
+  constructor(props) {
+    super(props)
+    this.state = {
+       message : '',
+       messageList : []
+    }
+    this.handlechange = this.handlechange.bind(this)
+    this.handleSubmit = this.handleSubmit.bind(this)
+  }
+  // change value input
+  handlechange(event){
+    this.setState({message : event.target.value})
+  }
+  // submit value form to add message list
+  handleSubmit(event){  
+    //message will be send
+    let value = {id:'me',message:this.state.message,time: new Date().toString()}
+    //message will be auto reply
+    let reply = {id:'someone',message:'reply',time: new Date().toString()}
+
+    this.setState({messageList:[...this.state.messageList,value,reply]})
+    event.preventDefault();
+  }
   render() {
+    console.log(this.state.messageList)
+    //show message list
+    let message_layout = this.state.messageList.map((item,index) =>{
+      if(item.id === 'someone')
+        return <div key = {index} className="incoming_msg">
+                <div className="incoming_msg_img"> <img src="/images/user-profile.png" alt="sunil" /> </div>
+                <div className="received_msg">
+                  <div className="received_withd_msg">
+                    <p>{item.message}</p>
+                    <span className="time_date">{item.time}</span></div>
+                </div>
+              </div>
+      else
+        return <div key = {index} className="outgoing_msg">
+                <div className="sent_msg">
+                  <p>{item.message}</p>
+                  <span className="time_date">{item.time}</span> </div>
+              </div>
+    })
     return (
       <div className="container">
         <h3 className=" text-center">Messaging</h3>
         <div className="messaging">
               <div className="inbox_msg">
-                <div className="mesgs">
+                <div className="mesgs layout">
                   <div className="msg_history">
-                    <div className="incoming_msg">
-                      <div className="incoming_msg_img"> <img src="/images/user-profile.png" alt="sunil" /> </div>
-                      <div className="received_msg">
-                        <div className="received_withd_msg">
-                          <p>Test which is a new approach to have all
-                            solutions</p>
-                          <span className="time_date"> 11:01 AM    |    June 9</span></div>
-                      </div>
-                    </div>
-                    <div className="outgoing_msg">
-                      <div className="sent_msg">
-                        <p>Test which is a new approach to have all
-                          solutions</p>
-                        <span className="time_date"> 11:01 AM    |    June 9</span> </div>
-                    </div>
-                    <div className="incoming_msg">
-                      <div className="incoming_msg_img"> <img src="/images/user-profile.png" alt="sunil" /> </div>
-                      <div className="received_msg">
-                        <div className="received_withd_msg">
-                          <p>Test, which is a new approach to have</p>
-                          <span className="time_date"> 11:01 AM    |    Yesterday</span></div>
-                      </div>
-                    </div>
-                    <div className="outgoing_msg">
-                      <div className="sent_msg">
-                        <p>Apollo University, Delhi, India Test</p>
-                        <span className="time_date"> 11:01 AM    |    Today</span> </div>
-                    </div>
-                    <div className="incoming_msg">
-                      <div className="incoming_msg_img"> <img src="/images/user-profile.png" alt="sunil" /> </div>
-                      <div className="received_msg">
-                        <div className="received_withd_msg">
-                          <p>We work directly with our designers and suppliers,
-                            and sell direct to you, which means quality, exclusive
-                            products, at a price anyone can afford.</p>
-                          <span className="time_date"> 11:01 AM    |    Today</span></div>
-                      </div>
-                    </div>
-                  </div>
+                    {message_layout}
+                  </div> 
                   <div className="type_msg">
                     <div className="input_msg_write">
-                      <input type="text" className="write_msg" placeholder="Type a message" />
-                      <button className="msg_send_btn" type="button"><i class="far fa-paper-plane"></i></button>
+                      <form onSubmit ={this.handleSubmit}>
+                        <input type="text" className="write_msg" placeholder="Type a message" value={this.state.message} onChange={this.handlechange} />
+                        <button className="msg_send_btn" type="submit"><i className="far fa-paper-plane"></i></button>
+                      </form>
                     </div>
                   </div>
                 </div>
