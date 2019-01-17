@@ -9,13 +9,14 @@ class App extends Component {
        message : '',
        messageList : [],
        //max length of message
-       maxlength : 10
+       maxlength : 50
     }
     this.handlechange = this.handlechange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
     this.configMessageBeforeShow = this.configMessageBeforeShow.bind(this)
     this.sliceMessage =  this.sliceMessage.bind(this)
     this.findNextIndex = this.findNextIndex.bind(this)
+    this.charLongerThan50 = this.charLongerThan50.bind(this)
   }
   // change value input
   handlechange(event){
@@ -23,16 +24,31 @@ class App extends Component {
   }
   // submit value form to add message list
   handleSubmit(event){  
-    //message will be send
+    if(!this.charLongerThan50(this.state.message)){
+      alert("erro: characters longer than 50 characters")
+    }else{
+       //message will be send
      let message = this.configMessageBeforeShow(this.state.message)
-    let value = {id:'me',message:message,time: new Date().toString()}
-    //message will be auto reply
-    let reply = {id:'someone',message:'reply',time: new Date().toString()}
-    this.setState({messageList:[...this.state.messageList,value,reply],message :''})
+     let value = {id:'me',message:message,time: new Date().toString()}
+     //message will be auto reply
+     let reply = {id:'someone',message:'reply',time: new Date().toString()}
+     this.setState({messageList:[...this.state.messageList,value,reply],message :''})
+    }
     event.preventDefault();
   }
+  /* check characters longer than 50 characters */
+  charLongerThan50(message){
+    let flag = true
+      let array = message.split(' ');
+      array.map(item =>{
+        if(item.length > this.state.maxlength){
+          flag = false
+          return;
+        }
+      })
+      return flag
+  }
   /*
-    characters longer than 50 characters, display an error,
     split it into chunks that each is less than or equal to 50 characters
    */
   configMessageBeforeShow(message){
@@ -58,22 +74,17 @@ class App extends Component {
       //cut corect messge
       let result_messege = message.slice(start, start+index)
       //
-      console.log(start, start+index)
       arr.push(result_messege)
       start += index+1;
       end = start + this.state.maxlength
-      console.log(start,end)
     }while(start < message.length)
     //end loop
-    console.log(arr)
     return arr
   }
   /*find corect index for cut message */
   findNextIndex(message){
-    console.log('=>',message.lastIndexOf(' '))
     if(message.length > this.state.maxlength){
-      if(message.lastIndexOf(' ') != -1){
-        console.log('ok')
+      if(message.lastIndexOf(' ') !== -1){
         //return space closest
         return message.lastIndexOf(' ')
       }else{
@@ -86,7 +97,6 @@ class App extends Component {
   }
   render() {
     //show message list
-    console.log(this.state.messageList)
     let message_layout = this.state.messageList.map((item,index) =>{
       if(item.id === 'someone')
         return <div key = {index} className="incoming_msg">
@@ -130,5 +140,4 @@ class App extends Component {
     );
   }
 }
-
 export default App;
