@@ -7,10 +7,15 @@ class App extends Component {
     super(props)
     this.state = {
        message : '',
-       messageList : []
+       messageList : [],
+       //max length of message
+       maxlength : 10
     }
     this.handlechange = this.handlechange.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
+    this.configMessageBeforeShow = this.configMessageBeforeShow.bind(this)
+    this.sliceMessage =  this.sliceMessage.bind(this)
+    this.findNextIndex = this.findNextIndex.bind(this)
   }
   // change value input
   handlechange(event){
@@ -19,15 +24,57 @@ class App extends Component {
   // submit value form to add message list
   handleSubmit(event){  
     //message will be send
-    let value = {id:'me',message:this.state.message,time: new Date().toString()}
+     let message = this.configMessageBeforeShow(this.state.message)
+    let value = {id:'me',message:message,time: new Date().toString()}
     //message will be auto reply
     let reply = {id:'someone',message:'reply',time: new Date().toString()}
-
     this.setState({messageList:[...this.state.messageList,value,reply]})
     event.preventDefault();
   }
+  /*
+    characters longer than 50 characters, display an error,
+    split it into chunks that each is less than or equal to 50 characters
+   */
+  configMessageBeforeShow(message){
+    let array ;
+    if(message.length > this.state.maxlength){
+      array = this.sliceMessage(message)
+    }
+    return array
+  }
+  /*
+  arr is result of list message,
+  start is start cut position
+  end is end cut position
+   */
+  sliceMessage(message){
+    let arr = []
+    let start = 0 
+    let end  = this.state.maxlength
+    //loop of cut
+    do{
+      let new_messege = message.slice(start, end+1)
+      let index = this.findNextIndex(new_messege)
+      //cut corect messge
+      let result_messege = message.slice(start, start+index)
+      //
+      arr.push(result_messege)
+      start += index+1;
+      end = start + this.state.maxlength
+    }while(start < message.length)
+    //end loop
+    return arr
+  }
+  /*find corect index for cut message */
+  findNextIndex(message){
+    if(message.lastIndexOf(' ') != -1){
+      //return space closest
+      return message.lastIndexOf(' ')
+    }else{
+      return message.length
+    }
+  }
   render() {
-    console.log(this.state.messageList)
     //show message list
     let message_layout = this.state.messageList.map((item,index) =>{
       if(item.id === 'someone')
@@ -42,7 +89,9 @@ class App extends Component {
       else
         return <div key = {index} className="outgoing_msg">
                 <div className="sent_msg">
-                  <p>{item.message}</p>
+                  {item.message.map((items,index) =>{
+                    return<p key={index}><span>{index+1}/{item.message.length}</span>{items}</p>
+                  })}
                   <span className="time_date">{item.time}</span> </div>
               </div>
     })
