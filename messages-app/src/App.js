@@ -28,7 +28,7 @@ class App extends Component {
     let value = {id:'me',message:message,time: new Date().toString()}
     //message will be auto reply
     let reply = {id:'someone',message:'reply',time: new Date().toString()}
-    this.setState({messageList:[...this.state.messageList,value,reply]})
+    this.setState({messageList:[...this.state.messageList,value,reply],message :''})
     event.preventDefault();
   }
   /*
@@ -36,7 +36,7 @@ class App extends Component {
     split it into chunks that each is less than or equal to 50 characters
    */
   configMessageBeforeShow(message){
-    let array ;
+    let array = [message] ;
     if(message.length > this.state.maxlength){
       array = this.sliceMessage(message)
     }
@@ -58,24 +58,35 @@ class App extends Component {
       //cut corect messge
       let result_messege = message.slice(start, start+index)
       //
+      console.log(start, start+index)
       arr.push(result_messege)
       start += index+1;
       end = start + this.state.maxlength
+      console.log(start,end)
     }while(start < message.length)
     //end loop
+    console.log(arr)
     return arr
   }
   /*find corect index for cut message */
   findNextIndex(message){
-    if(message.lastIndexOf(' ') != -1){
-      //return space closest
-      return message.lastIndexOf(' ')
+    console.log('=>',message.lastIndexOf(' '))
+    if(message.length > this.state.maxlength){
+      if(message.lastIndexOf(' ') != -1){
+        console.log('ok')
+        //return space closest
+        return message.lastIndexOf(' ')
+      }else{
+        return message.length
+      }
     }else{
       return message.length
     }
+    
   }
   render() {
     //show message list
+    console.log(this.state.messageList)
     let message_layout = this.state.messageList.map((item,index) =>{
       if(item.id === 'someone')
         return <div key = {index} className="incoming_msg">
@@ -89,8 +100,8 @@ class App extends Component {
       else
         return <div key = {index} className="outgoing_msg">
                 <div className="sent_msg">
-                  {item.message.map((items,index) =>{
-                    return<p key={index}><span>{index+1}/{item.message.length}</span>{items}</p>
+                  {item.message.map((row,index) =>{
+                    return<p key={index}>{(item.message.length > 1)?<span>[{index+1}/{item.message.length}] </span>:""}{row}</p>
                   })}
                   <span className="time_date">{item.time}</span> </div>
               </div>
@@ -108,7 +119,7 @@ class App extends Component {
                     <div className="input_msg_write">
                       <form onSubmit ={this.handleSubmit}>
                         <input type="text" className="write_msg" placeholder="Type a message" value={this.state.message} onChange={this.handlechange} />
-                        <button className="msg_send_btn" type="submit"><i className="far fa-paper-plane"></i></button>
+                        <button className="msg_send_btn" type="submit" disabled={this.state.message === ''?true:false}><i className="far fa-paper-plane"></i></button>
                       </form>
                     </div>
                   </div>
